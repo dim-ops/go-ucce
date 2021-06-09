@@ -19,7 +19,7 @@ func main() {
 
 	flag.StringVar(&Brique, "brique", "", "quel type de VOS")
 	flag.StringVar(&IP, "ip", "", "quelle IP")
-	flag.StringVar(&CMD, "cmd", "", "quelle commande executer")
+	flag.StringVar(&CMD, "CMD", "", "quelle commande executer")
 	flag.Parse()
 	flag.Args()
 
@@ -40,7 +40,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if Brique != "" && IP != "" && CMD != "" {
+	if Brique != "" && IP != "" {
 		ssh.ConnexionSSH(Identifiants, IP, CMD)
 	} else {
 		fmt.Printf("Argument manquant pour initialiser une connexion ssh\n")

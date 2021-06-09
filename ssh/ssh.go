@@ -1,11 +1,16 @@
 package ssh
 
 import (
+	"fmt"
 	"log"
-	"os"
+	"regexp"
 	"time"
 
 	"golang.org/x/crypto/ssh"
+)
+
+const (
+	timeout = 10 * time.Minute
 )
 
 func ConnexionSSH(Identifiants []string, IP, CMD string) {
@@ -26,28 +31,20 @@ func ConnexionSSH(Identifiants []string, IP, CMD string) {
 		Timeout: 10 * time.Second,
 	}
 
-	// connect
-	client, err := ssh.Dial("tcp", IP+":"+port, config)
+	e, _, err := expect.SpawnSSH(config, timeout)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer client.Close()
+	defer e.Close()
 
-	// start session
-	sess, err := client.NewSession()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer sess.Close()
+	e.ExpectBatch([]expect.Batcher{
+		&expect.BCas{[]expect.Caser{
+			&expect.Case{R: regexp.MustCompile(`router#`), T: expect.OK()},
+			&expect.Case{R: regexp.MustCompile(`Login: `), S: *user,
+				T: expect.Continue(expect.NewStatus(codes.PermissionDenied, "wrong username")), Rt: 3},
+			&expect.Case{R: regexp.MustCompile(`Password: `), S: *pass1, T: expect.Next(), Rt: 1},
+				T: expect.Continue(expect.NewStatus(codes.PermissionDenied, "wrong password")), Rt: 1},
+		}},
+	}, timeout)
 
-	// setup standard out and error
-	// uses writer interface
-	sess.Stdout = os.Stdout
-	sess.Stderr = os.Stderr
-
-	// run single command
-	err = sess.Run(CMD)
-	if err != nil {
-		log.Fatal(err)
-	}
 }
