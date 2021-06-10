@@ -50,4 +50,5 @@ func ConnexionSSH(Identifiants []string, IP, CMD string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 }
