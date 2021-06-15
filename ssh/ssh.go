@@ -11,6 +11,7 @@ import (
 
 func ConnexionSSH(Identifiants []string, IP, CMD string) {
 
+	//Choix de la commande
 	switch CMD {
 	case "status":
 		CMD = "show status"
@@ -24,6 +25,7 @@ func ConnexionSSH(Identifiants []string, IP, CMD string) {
 		CMD = "show cuic license-info"
 	}
 
+	//les commandes à passer
 	commands := []string{
 		CMD,
 		"exit",

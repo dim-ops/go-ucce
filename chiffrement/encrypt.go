@@ -11,7 +11,10 @@ import (
 	"os"
 )
 
-func decrypt(cipherstring string, keystring string) string {
+//Doc : https://gist.github.com/josephspurrier/12cc5ed76d2228a41ceb
+//https://eli.thegreenplace.net/2019/aes-encryption-of-files-in-go/
+
+func Decrypt(cipherstring string, keystring string) string {
 	// Byte array of the string
 	ciphertext := []byte(cipherstring)
 
@@ -92,7 +95,7 @@ func writeToFile(data, file string) {
 	ioutil.WriteFile(file, []byte(data), 777)
 }
 
-func readFromFile(file string) ([]byte, error) {
+func ReadFromFile(file string) ([]byte, error) {
 	data, err := ioutil.ReadFile(file)
 	return data, err
 }
@@ -124,10 +127,10 @@ func WhatToDo() {
 		case "decrypt":
 			fmt.Print("What is the name of the file to decrypt: ")
 			line2 := readline()
-			if ciphertext, err := readFromFile(line2); err != nil {
+			if ciphertext, err := ReadFromFile(line2); err != nil {
 				fmt.Println("File is not found")
 			} else {
-				plaintext := decrypt(string(ciphertext), key)
+				plaintext := Decrypt(string(ciphertext), key)
 				fmt.Println(plaintext)
 			}
 		}
