@@ -101,7 +101,7 @@ func WhatToDo() {
 	key := "testtesttesttest"
 
 	for {
-		fmt.Print("What would you like to do? ")
+		fmt.Print("Qu'est ce que tu veux faire ? (encrypt/descrypt/exit)\n")
 		line := readline()
 
 		switch line {
@@ -110,13 +110,17 @@ func WhatToDo() {
 		case "exit":
 			os.Exit(0)
 		case "encrypt":
-			fmt.Print("What would you like to encrypt: ")
+			fmt.Print("Quel identifiant veux-tu chiffrer ?\n")
 			line2 := readline()
-			ciphertext := encrypt(line2, key)
-			fmt.Print("What is the file name: ")
+			cipherId := encrypt(line2, key)
+			fmt.Print("Quel mot de passe veux-tu ciffrer ?\n")
 			line3 := readline()
-			writeToFile(ciphertext, line3)
-			fmt.Println("Wrote to file")
+			cipherPass := encrypt(line3, key)
+			fmt.Print("Pour quelle brique sont ces identifiants ?\n")
+			line4 := readline()
+			writeToFile(cipherId, line4+"Id.txt")
+			writeToFile(cipherPass, line4+"Pass.txt")
+			fmt.Println("Wrote to files")
 		case "decrypt":
 			fmt.Print("What is the name of the file to decrypt: ")
 			line2 := readline()
