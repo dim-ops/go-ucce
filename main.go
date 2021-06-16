@@ -3,7 +3,6 @@ package main
 import (
 	"DERS_3CG_CISCO/expect/chiffrement"
 	"DERS_3CG_CISCO/expect/ssh"
-	_ "embed"
 	"flag"
 	"log"
 	"os"
