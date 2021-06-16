@@ -31,7 +31,7 @@ func ConnexionSSH(Identifiants []string, IP, CMD string) {
 		"exit",
 	}
 
-	log.Printf("Connexion ssh is pending...")
+	//log.Printf("Connexion ssh is pending...")
 
 	//Port SSH à utiliser
 	port := "22"
@@ -98,7 +98,7 @@ func ConnexionSSH(Identifiants []string, IP, CMD string) {
 
 		_, err = fmt.Fprintf(stdin, "%s\n", cmd)
 
-		fmt.Println(cmd)
+		//fmt.Println(cmd)
 		//Besoin de ralentir l'execution du script, sinon il lance le exit avant le VOS n'ait eu le temps d'executer la premiere CMD
 		time.Sleep(15 * time.Second)
 

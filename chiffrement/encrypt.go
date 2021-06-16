@@ -101,7 +101,7 @@ func ReadFromFile(file string) ([]byte, error) {
 }
 
 func WhatToDo() {
-	key := "testtesttesttest"
+	key := "20Ders3CGEvita20"
 
 	for {
 		fmt.Print("Qu'est ce que tu veux faire ? (encrypt/descrypt/exit)\n")

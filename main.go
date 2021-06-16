@@ -3,12 +3,14 @@ package main
 import (
 	"DERS_3CG_CISCO/expect/chiffrement"
 	"DERS_3CG_CISCO/expect/ssh"
+	_ "embed"
 	"flag"
 	"log"
+	"os"
+	"runtime"
 )
 
 //Declaration des variables
-var ExtFile []string
 var Identifiants []string
 var Brique string
 var IP string
@@ -34,21 +36,34 @@ func main() {
 
 	} else if Brique != "" && IP != "" && CMD != "" {
 		//Si l'un des flags est manquant erreur sinon appelle de la function ConnexionSSH présent dans le package ssh
-		log.Printf("Read file with identifiants")
+		//log.Printf("Read file with identifiants")
 
 		//Extension des fichiers
 		extFile := [2]string{"Id.txt", "Pass.txt"}
 
-		//Lecture des fichiers contenant les IDs
-		for i := range extFile {
-			chiffer, _ := chiffrement.ReadFromFile(Brique + extFile[i])
-			id := chiffrement.Decrypt(string(chiffer), "testtesttesttest")
-			Identifiants = append(Identifiants, id)
+		if runtime.GOOS == "windows" {
+			//environnement de dev (e-buro)
+			for i := range extFile {
+				chiffer, _ := chiffrement.ReadFromFile(Brique + extFile[i])
+				id := chiffrement.Decrypt(string(chiffer), "20Ders3CGEvita20")
+				Identifiants = append(Identifiants, id)
+			}
+		} else {
+			for i := range extFile {
+				//environnement d'exploitation Linux
+				pathFile := "/usr/etc/script/" + Brique + extFile[i]
+				chiffer, _ := chiffrement.ReadFromFile(pathFile)
+				id := chiffrement.Decrypt(string(chiffer), "20Ders3CGEvita20")
+				Identifiants = append(Identifiants, id)
+			}
 		}
+
+		//Lecture des fichiers contenant les IDs
 
 		ssh.ConnexionSSH(Identifiants, IP, CMD)
 
 	} else {
+		os.Exit(0)
 		log.Printf("Argument manquant pour initialiser une connexion ssh\n")
 	}
 
