@@ -16,4 +16,4 @@ Execution -brique -ip -cmd <br />
 Ex : expect -brique cuic -ip A.B.C.D -cmd status // go run main.go -brique cuic -ip A.B.C.D -cmd status <br />
 
 ## Identifiants
-Chaque identifiant est à son son propre fichier. C'est un choix volontaire pour simplifier le code et cela peut permettre à quelqu'un de l'équipe de monter en compétence sur Go en stockant tous les identifiants dans un fichier unique. <br />
+Chaque identifiant a son propre fichier. C'est un choix volontaire pour simplifier le code et cela peut permettre à quelqu'un de l'équipe de monter en compétence sur Go en stockant tous les identifiants dans un fichier unique. <br />
