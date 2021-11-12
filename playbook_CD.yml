@@ -1,0 +1,15 @@
+---
+- name: Deploy expect to SUPBO
+  become: true
+  hosts: SUPBO
+
+  tasks:
+
+    - name: Copy executable
+      copy:
+        src: /home/ansible/delivery/expect
+        dest: /opt/nagiosPluginCommand/
+        backup: yes
+        owner: nagiosagent
+        grpup: nagiosagent
+        mode: 0755
