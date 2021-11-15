@@ -2,7 +2,6 @@ image: golang:latest
 
 stages:
   - compile
-  - test
 
 compile:
   stage: compile
@@ -11,9 +10,3 @@ compile:
   artifacts:
     paths:
       - expect
-
-test:
-  stage: test
-  script:
-    - chmod +x expect
-    - go test './tests/'

@@ -9,7 +9,7 @@
       copy:
         src: /home/ansible/delivery/expect
         dest: /opt/nagiosPluginCommand/
-        backup: yes
         owner: nagiosagent
         grpup: nagiosagent
-        mode: 0755
+        mode: '0755'
+        force: yes
