@@ -5,6 +5,11 @@
 
   tasks:
 
+    - name: Stop service Nagios
+      ansible.builtin.service:
+        name: nagiosAgent
+        state: stopped
+
     - name: Copy executable
       copy:
         src: /home/ansible/delivery/expect
@@ -13,3 +18,8 @@
         grpup: nagiosagent
         mode: '0755'
         force: yes
+
+    - name: Start service Nagios
+      ansible.builtin.service:
+        name: nagiosAgent
+        state: started
