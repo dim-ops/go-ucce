@@ -15,7 +15,7 @@
         src: /home/ansible/delivery/expect
         dest: /opt/nagiosPluginCommand/
         owner: nagiosagent
-        grpup: nagiosagent
+        group: nagiosagent
         mode: '0755'
         force: yes
 
