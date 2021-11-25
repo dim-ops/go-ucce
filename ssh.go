@@ -100,7 +100,7 @@ func ConnexionSSH(Identifiants []string, IP, CMD string) {
 
 		//fmt.Println(cmd)
 		//Besoin de ralentir l'execution du script, sinon il lance le exit avant le VOS n'ait eu le temps d'executer la premiere CMD
-		time.Sleep(15 * time.Second)
+		time.Sleep(20 * time.Second)
 
 		if err != nil {
 			log.Fatal(err)
