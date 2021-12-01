@@ -42,7 +42,7 @@ func main() {
 			//environnement de dev (e-buro)
 			for i := range extFile {
 				chiffer, _ := ReadFromFile(Brique + extFile[i])
-				id := Decrypt(string(chiffer), "20Ders3CGEvita20")
+				id := Decrypt(string(chiffer), "KEY_TO_REPLACE")
 				Identifiants = append(Identifiants, id)
 			}
 		} else {
