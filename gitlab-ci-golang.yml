@@ -6,7 +6,6 @@ stages:
 compile:
   stage: compile
   script:
-    - echo $ENCRYPT_KEY
     - sed -i "s/KEY_TO_REPLACE/$ENCRYPT_KEY/" main.go
     - go build
   artifacts:
