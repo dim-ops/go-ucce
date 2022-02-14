@@ -11,6 +11,8 @@ import (
 
 func ConnexionSSH(Identifiants []string, IP, CMD string) {
 
+	var commands []string
+
 	//Choix de la commande
 	switch CMD {
 	case "status":
@@ -23,12 +25,22 @@ func ConnexionSSH(Identifiants []string, IP, CMD string) {
 		CMD = "run sql select name from ApplicationUser where name like '%jtapi%'"
 	case "licence_cuic":
 		CMD = "show cuic license-info"
+	case "shutdown":
+		CMD = "utils system shutdown"
 	}
 
-	//les commandes à passer
-	commands := []string{
-		CMD,
-		"exit",
+	if CMD == "utils system shutdown" {
+		//les commandes à passer
+		commands = []string{
+			CMD,
+			"yes",
+		}
+	} else {
+		//les commandes à passer
+		commands = []string{
+			CMD,
+			"exit",
+		}
 	}
 
 	//log.Printf("Connexion ssh is pending...")
@@ -100,7 +112,7 @@ func ConnexionSSH(Identifiants []string, IP, CMD string) {
 
 		//fmt.Println(cmd)
 		//Besoin de ralentir l'execution du script, sinon il lance le exit avant le VOS n'ait eu le temps d'executer la premiere CMD
-		time.Sleep(20 * time.Second)
+		time.Sleep(10 * time.Second)
 
 		if err != nil {
 			log.Fatal(err)

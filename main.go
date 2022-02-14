@@ -26,8 +26,10 @@ func main() {
 	flag.Parse()
 	flag.Args()
 
+	key := "KEY_TO_REPLACE"
+
 	//Si ENCRYPT == true, l'utilisateur va chiffrer les identifiants
-	if ENCRYPT == true {
+	if ENCRYPT {
 
 		WhatToDo()
 
@@ -42,7 +44,7 @@ func main() {
 			//environnement de dev (e-buro)
 			for i := range extFile {
 				chiffer, _ := ReadFromFile(Brique + extFile[i])
-				id := Decrypt(string(chiffer), "KEY_TO_REPLACE")
+				id := Decrypt(string(chiffer), key)
 				Identifiants = append(Identifiants, id)
 			}
 		} else {
@@ -50,7 +52,7 @@ func main() {
 				//environnement d'exploitation Linux
 				pathFile := "/usr/etc/script/" + Brique + extFile[i]
 				chiffer, _ := ReadFromFile(pathFile)
-				id := Decrypt(string(chiffer), "20Ders3CGEvita20")
+				id := Decrypt(string(chiffer), key)
 				Identifiants = append(Identifiants, id)
 			}
 		}
