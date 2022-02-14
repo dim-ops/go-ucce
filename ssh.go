@@ -12,6 +12,7 @@ import (
 func ConnexionSSH(Identifiants []string, IP, CMD string) {
 
 	var commands []string
+	var timeToWait int
 
 	//Choix de la commande
 	switch CMD {
@@ -35,12 +36,18 @@ func ConnexionSSH(Identifiants []string, IP, CMD string) {
 			CMD,
 			"yes",
 		}
+
+		// Pas besoin d'attendre plus pour éteindre le VOS
+		timeToWait = 10
 	} else {
 		//les commandes à passer
 		commands = []string{
 			CMD,
 			"exit",
 		}
+
+		// L'output est un peu longue à charger, il faut attendre 20sec pour être sûr de la capturer
+		timeToWait = 20
 	}
 
 	//log.Printf("Connexion ssh is pending...")
@@ -112,7 +119,7 @@ func ConnexionSSH(Identifiants []string, IP, CMD string) {
 
 		//fmt.Println(cmd)
 		//Besoin de ralentir l'execution du script, sinon il lance le exit avant le VOS n'ait eu le temps d'executer la premiere CMD
-		time.Sleep(10 * time.Second)
+		time.Sleep(time.Duration(timeToWait) * time.Second)
 
 		if err != nil {
 			log.Fatal(err)
