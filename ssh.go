@@ -9,8 +9,13 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-func ConnexionSSH(Identifiants []string, IP, CMD string) {
+type Connection struct {
+	*ssh.Client
+	user     string
+	password string
+}
 
+func SelectCommand(CMD string) ([]string, int) {
 	var commands []string
 	var timeToWait int
 
@@ -37,8 +42,9 @@ func ConnexionSSH(Identifiants []string, IP, CMD string) {
 			"yes",
 		}
 
-		// Pas besoin d'attendre plus pour éteindre le VOS
-		timeToWait = 10
+		//Besoin d'attendre plus pour éteindre le VOS
+		timeToWait = 25
+
 	} else {
 		//les commandes à passer
 		commands = []string{
@@ -50,33 +56,32 @@ func ConnexionSSH(Identifiants []string, IP, CMD string) {
 		timeToWait = 20
 	}
 
-	//log.Printf("Connexion ssh is pending...")
+	return commands, timeToWait
+}
 
-	//Port SSH à utiliser
-	port := "22"
+func Connect(Identifiants []string, IP string) (*Connection, error) {
 
-	//Configuration du client SSH
-	config := &ssh.ClientConfig{
+	sshConfig := &ssh.ClientConfig{
 		User: Identifiants[0],
 		Auth: []ssh.AuthMethod{
 			ssh.Password(Identifiants[1]),
 		},
-		//Ignore les clés SSH
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-
-		//Si pas de réponse au bout de 10sec => Stop
-		Timeout: 10 * time.Second,
 	}
 
-	//Connection à la VM
-	client, err := ssh.Dial("tcp", IP+":"+port, config)
+	conn, err := ssh.Dial("tcp", IP, sshConfig)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	defer client.Close()
 
+	return &Connection{conn, Identifiants[0], Identifiants[1]}, nil
+}
+
+func (conn *Connection) SendCommands(CMD string) error {
+
+	cmds, timeToWait := SelectCommand(CMD)
 	//Lancement de la connexion SSH
-	sess, err := client.NewSession()
+	sess, err := conn.NewSession()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -113,7 +118,7 @@ func ConnexionSSH(Identifiants []string, IP, CMD string) {
 	}
 
 	//Envoie des inputs => CMD
-	for _, cmd := range commands {
+	for _, cmd := range cmds {
 
 		_, err = fmt.Fprintf(stdin, "%s\n", cmd)
 
@@ -132,4 +137,5 @@ func ConnexionSSH(Identifiants []string, IP, CMD string) {
 		log.Fatal(err)
 	}
 
+	return err
 }

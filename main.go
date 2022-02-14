@@ -26,7 +26,7 @@ func main() {
 	flag.Parse()
 	flag.Args()
 
-	key := "KEY_TO_REPLACE"
+	key := "20Ders3CGEvita20"
 
 	//Si ENCRYPT == true, l'utilisateur va chiffrer les identifiants
 	if ENCRYPT {
@@ -58,7 +58,17 @@ func main() {
 		}
 
 		//Lecture des fichiers contenant les IDs
-		ConnexionSSH(Identifiants, IP, CMD)
+		//Connect(Identifiants, IP, CMD)
+		IP = IP + ":22"
+		conn, err := Connect(Identifiants, IP)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = conn.SendCommands(CMD)
+		if err != nil {
+			log.Fatal(err)
+		}
 
 	} else {
 		os.Exit(1)
