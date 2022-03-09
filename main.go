@@ -26,7 +26,7 @@ func main() {
 	flag.Parse()
 	flag.Args()
 
-	key := "KEY_TO_REPLACE"
+	key := "20Ders3CGEvita20"
 
 	//Si ENCRYPT == true, l'utilisateur va chiffrer les identifiants
 	if ENCRYPT {

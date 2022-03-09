@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/ssh"
@@ -39,7 +42,7 @@ func SelectCommand(CMD string) ([]string, int) {
 		//les commandes à passer
 		commands = []string{
 			CMD,
-			"yes",
+			//"yes",
 		}
 
 		//Besoin d'attendre plus pour éteindre le VOS
@@ -99,9 +102,6 @@ func (conn *Connection) SendCommands(CMD string) error {
 		sess.Close()
 	}
 
-	//Output ssh
-	sess.Stdout = os.Stdout
-
 	//Error ssh
 	sess.Stderr = os.Stderr
 
@@ -109,6 +109,47 @@ func (conn *Connection) SendCommands(CMD string) error {
 	stdin, err := sess.StdinPipe()
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	if cmds[0] != "utils system shutdown" {
+		//Output ssh
+		sess.Stdout = os.Stdout
+	} else {
+		stdout, err := sess.StdoutPipe()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var output []byte
+
+		go func(stdin io.WriteCloser, stdout io.Reader, output *[]byte) {
+			var (
+				line string
+				r    = bufio.NewReader(stdout)
+			)
+			for {
+				b, err := r.ReadByte()
+				if err != nil {
+					break
+				}
+
+				*output = append(*output, b)
+
+				if b == byte('\n') {
+					line = ""
+					continue
+				}
+
+				line += string(b)
+
+				if strings.Contains(line, "Enter (yes/no)") {
+					_, err = fmt.Fprintf(stdin, "%s\n", "yes")
+					if err != nil {
+						break
+					}
+				}
+			}
+		}(stdin, stdout, &output)
 	}
 
 	//Lanchement du shell à distance
