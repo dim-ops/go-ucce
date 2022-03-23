@@ -92,7 +92,7 @@ func readline() string {
 }
 
 func writeToFile(data, file string) {
-	ioutil.WriteFile(file, []byte(data), 777)
+	ioutil.WriteFile(file, []byte(data), 0777)
 }
 
 func ReadFromFile(file string) ([]byte, error) {

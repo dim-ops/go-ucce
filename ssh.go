@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	"time"
 
 	"golang.org/x/crypto/ssh"
 )
@@ -18,48 +17,32 @@ type Connection struct {
 	password string
 }
 
-func SelectCommand(CMD string) ([]string, int) {
-	var commands []string
-	var timeToWait int
-
+func SelectCommand(CMD, brique string) string {
+	var command string
 	//Choix de la commande
 	switch CMD {
 	case "status":
-		CMD = "show status"
+		command = "show status"
 	case "service":
-		CMD = "utils service list"
+		command = "utils service list"
 	case "replication":
-		CMD = "utils dbreplication runtimestate"
+		command = "utils dbreplication runtimestate"
 	case "jtapi_users":
-		CMD = "run sql select name from ApplicationUser where name like '%jtapi%'"
+		command = "run sql select name from ApplicationUser where name like '%jtapi%'"
 	case "licence_cuic":
-		CMD = "show cuic license-info"
+		command = "show cuic license-info"
 	case "shutdown":
-		CMD = "utils system shutdown"
-	}
-
-	if CMD == "utils system shutdown" {
-		//les commandes à passer
-		commands = []string{
-			CMD,
-			//"yes",
+		if brique != "cusp" {
+			CMD = "utils system shutdown"
+			//commands = []string{CMD, "\n"}
+		} else {
+			CMD = "shutdown"
+			//commands = []string{CMD}
 		}
 
-		//Besoin d'attendre plus pour éteindre le VOS
-		timeToWait = 25
-
-	} else {
-		//les commandes à passer
-		commands = []string{
-			CMD,
-			"exit",
-		}
-
-		// L'output est un peu longue à charger, il faut attendre 20sec pour être sûr de la capturer
-		timeToWait = 20
 	}
 
-	return commands, timeToWait
+	return command
 }
 
 func Connect(Identifiants []string, IP string) (*Connection, error) {
@@ -82,7 +65,7 @@ func Connect(Identifiants []string, IP string) (*Connection, error) {
 
 func (conn *Connection) SendCommands(CMD string) error {
 
-	cmds, timeToWait := SelectCommand(CMD)
+	command := SelectCommand(CMD, Brique)
 	//Lancement de la connexion SSH
 	sess, err := conn.NewSession()
 	if err != nil {
@@ -111,10 +94,50 @@ func (conn *Connection) SendCommands(CMD string) error {
 		log.Fatal(err)
 	}
 
-	if cmds[0] != "utils system shutdown" {
+	if CMD != "utils system shutdown" {
 		//Output ssh
-		sess.Stdout = os.Stdout
+		//Nécessaire pour les pluginCommands
+		stdout, err := sess.StdoutPipe()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var output []byte
+		//Tourne en tâche de fond
+		//Analyse chaque ligne renvoyée dans le terminal
+		//Si contient (yes/no), la fonction le détécte et envoie yes pour arrêter le VOS
+		go func(stdin io.WriteCloser, stdout io.Reader, output *[]byte) {
+			var (
+				line string
+				r    = bufio.NewReader(stdout)
+			)
+			for {
+				b, err := r.ReadByte()
+				if err != nil {
+					break
+				}
+
+				*output = append(*output, b)
+
+				if b == byte('\n') {
+					line = ""
+					continue
+				}
+
+				line += string(b)
+
+				if strings.Contains(line, "admin") {
+					_, err = fmt.Fprintf(stdin, "%s\n", "exit")
+					if err != nil {
+						break
+					}
+				}
+			}
+
+			fmt.Print(string(*output))
+		}(stdin, stdout, &output)
 	} else {
+
 		stdout, err := sess.StdoutPipe()
 		if err != nil {
 			log.Fatal(err)
@@ -122,6 +145,9 @@ func (conn *Connection) SendCommands(CMD string) error {
 
 		var output []byte
 
+		//Tourne en tâche de fond
+		//Analyse chaque ligne renvoyée dans le terminal
+		//Si contient (yes/no), la fonction le détécte et envoie yes pour arrêter le VOS
 		go func(stdin io.WriteCloser, stdout io.Reader, output *[]byte) {
 			var (
 				line string
@@ -159,17 +185,10 @@ func (conn *Connection) SendCommands(CMD string) error {
 	}
 
 	//Envoie des inputs => CMD
-	for _, cmd := range cmds {
 
-		_, err = fmt.Fprintf(stdin, "%s\n", cmd)
-
-		//fmt.Println(cmd)
-		//Besoin de ralentir l'execution du script, sinon il lance le exit avant le VOS n'ait eu le temps d'executer la premiere CMD
-		time.Sleep(time.Duration(timeToWait) * time.Second)
-
-		if err != nil {
-			log.Fatal(err)
-		}
+	_, err = fmt.Fprintf(stdin, "%s\n", command)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	//Attend que la ou les commandes ssh n'execute
