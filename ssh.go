@@ -94,89 +94,55 @@ func (conn *Connection) SendCommands(CMD string) error {
 		log.Fatal(err)
 	}
 
-	if CMD != "utils system shutdown" {
-		//Output ssh
-		//Nécessaire pour les pluginCommands
-		stdout, err := sess.StdoutPipe()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		var output []byte
-		//Tourne en tâche de fond
-		//Analyse chaque ligne renvoyée dans le terminal
-		//Si contient (yes/no), la fonction le détécte et envoie yes pour arrêter le VOS
-		go func(stdin io.WriteCloser, stdout io.Reader, output *[]byte) {
-			var (
-				line string
-				r    = bufio.NewReader(stdout)
-			)
-			for {
-				b, err := r.ReadByte()
-				if err != nil {
-					break
-				}
-
-				*output = append(*output, b)
-
-				if b == byte('\n') {
-					line = ""
-					continue
-				}
-
-				line += string(b)
-
-				if strings.Contains(line, "admin") {
-					_, err = fmt.Fprintf(stdin, "%s\n", "exit")
-					if err != nil {
-						break
-					}
-				}
-			}
-
-			fmt.Print(string(*output))
-		}(stdin, stdout, &output)
-	} else {
-
-		stdout, err := sess.StdoutPipe()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		var output []byte
-
-		//Tourne en tâche de fond
-		//Analyse chaque ligne renvoyée dans le terminal
-		//Si contient (yes/no), la fonction le détécte et envoie yes pour arrêter le VOS
-		go func(stdin io.WriteCloser, stdout io.Reader, output *[]byte) {
-			var (
-				line string
-				r    = bufio.NewReader(stdout)
-			)
-			for {
-				b, err := r.ReadByte()
-				if err != nil {
-					break
-				}
-
-				*output = append(*output, b)
-
-				if b == byte('\n') {
-					line = ""
-					continue
-				}
-
-				line += string(b)
-
-				if strings.Contains(line, "Enter (yes/no)") {
-					_, err = fmt.Fprintf(stdin, "%s\n", "yes")
-					if err != nil {
-						break
-					}
-				}
-			}
-		}(stdin, stdout, &output)
+	//Output ssh
+	//Nécessaire pour les pluginCommands
+	stdout, err := sess.StdoutPipe()
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	var output []byte
+	//Tourne en tâche de fond
+	//Analyse chaque ligne renvoyée dans le terminal
+	//Si contient (yes/no), la fonction le détécte et envoie yes pour arrêter le VOS
+	go func(stdin io.WriteCloser, stdout io.Reader, output *[]byte) {
+		var (
+			line string
+			r    = bufio.NewReader(stdout)
+		)
+		for {
+			b, err := r.ReadByte()
+			if err != nil {
+				break
+			}
+
+			*output = append(*output, b)
+
+			if b == byte('\n') {
+				line = ""
+				continue
+			}
+
+			line += string(b)
+
+			if strings.Contains(line, "admin") {
+				_, err = fmt.Fprintf(stdin, "%s\n", "exit")
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
+
+			if strings.Contains(line, "Enter (yes/no)") {
+				_, err = fmt.Fprintf(stdin, "%s\n", "yes")
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
+
+		}
+
+		fmt.Print(string(*output))
+	}(stdin, stdout, &output)
 
 	//Lanchement du shell à distance
 	err = sess.Shell()
