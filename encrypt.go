@@ -104,7 +104,7 @@ func WhatToDo() {
 	key := "20Ders3CGEvita20"
 
 	for {
-		fmt.Print("Qu'est ce que tu veux faire ? (encrypt/descrypt/exit)\n")
+		fmt.Print("Qu'est ce que tu veux faire ? (encrypt/decrypt/exit)\n")
 		line := readline()
 
 		switch line {

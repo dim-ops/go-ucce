@@ -42,6 +42,8 @@ func SelectCommand(CMD, brique string) string {
 
 	}
 
+	log.Println("Commande sélectionnée")
+
 	return command
 }
 
@@ -59,6 +61,8 @@ func Connect(Identifiants []string, IP string) (*Connection, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	log.Println("Fonctione Connect appelé")
 
 	return &Connection{conn, Identifiants[0], Identifiants[1]}, nil
 }
@@ -151,7 +155,6 @@ func (conn *Connection) SendCommands(CMD string) error {
 	}
 
 	//Envoie des inputs => CMD
-
 	_, err = fmt.Fprintf(stdin, "%s\n", command)
 	if err != nil {
 		log.Fatal(err)
