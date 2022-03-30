@@ -137,14 +137,15 @@ func (conn *Connection) SendCommands(CMD string) error {
 
 			line += string(b)
 
-			if strings.Contains(line, "admin") {
+			if strings.Contains(line, "admin") && strings.Contains(line, "admin:"+command) {
 				_, err = fmt.Fprintf(stdin, "%s\n", "exit")
 				if err != nil {
 					log.Fatal(err)
 				}
+				log.Println("Two conditions are ok, exit has been send")
 			}
 
-			if strings.Contains(line, "Enter (yes/no)") {
+			if strings.Contains(line, "Enter (yes/no)") && strings.Contains(line, "admin:"+command) {
 				_, err = fmt.Fprintf(stdin, "%s\n", "yes")
 				if err != nil {
 					log.Fatal(err)
