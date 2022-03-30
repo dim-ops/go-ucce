@@ -148,7 +148,6 @@ func (conn *Connection) SendCommands(CMD string) error {
 				if err != nil {
 					log.Fatal(err)
 				}
-				log.Println("Les 3 conditions sont remplises")
 				break
 			}
 
