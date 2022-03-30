@@ -42,8 +42,6 @@ func SelectCommand(CMD, brique string) string {
 
 	}
 
-	log.Println("Commande sélectionnée")
-
 	return command
 }
 
@@ -61,8 +59,6 @@ func Connect(Identifiants []string, IP string) (*Connection, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	log.Println("Fonctione Connect appelé")
 
 	return &Connection{conn, Identifiants[0], Identifiants[1]}, nil
 }
@@ -105,6 +101,18 @@ func (conn *Connection) SendCommands(CMD string) error {
 		log.Fatal(err)
 	}
 
+	//Lanchement du shell à distance
+	err = sess.Shell()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	//Envoie des inputs => CMD
+	_, err = fmt.Fprintf(stdin, "%s\n", command)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	var output []byte
 	//Tourne en tâche de fond
 	//Analyse chaque ligne renvoyée dans le terminal
@@ -134,7 +142,6 @@ func (conn *Connection) SendCommands(CMD string) error {
 				if err != nil {
 					log.Fatal(err)
 				}
-				log.Printf("Exit has benn send")
 			}
 
 			if strings.Contains(line, "Enter (yes/no)") {
@@ -142,26 +149,12 @@ func (conn *Connection) SendCommands(CMD string) error {
 				if err != nil {
 					log.Fatal(err)
 				}
-				log.Printf("yes has benn send")
 			}
 
 		}
 
 		fmt.Print(string(*output))
 	}(stdin, stdout, &output)
-
-	//Lanchement du shell à distance
-	err = sess.Shell()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	//Envoie des inputs => CMD
-	_, err = fmt.Fprintf(stdin, "%s\n", command)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("Firsr command has benn send")
 
 	//Attend que la ou les commandes ssh n'execute
 	err = sess.Wait()
