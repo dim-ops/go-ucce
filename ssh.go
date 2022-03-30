@@ -134,6 +134,7 @@ func (conn *Connection) SendCommands(CMD string) error {
 				if err != nil {
 					log.Fatal(err)
 				}
+				log.Printf("Exit has benn send")
 			}
 
 			if strings.Contains(line, "Enter (yes/no)") {
@@ -141,6 +142,7 @@ func (conn *Connection) SendCommands(CMD string) error {
 				if err != nil {
 					log.Fatal(err)
 				}
+				log.Printf("yes has benn send")
 			}
 
 		}
@@ -159,6 +161,7 @@ func (conn *Connection) SendCommands(CMD string) error {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Printf("Firsr command has benn send")
 
 	//Attend que la ou les commandes ssh n'execute
 	err = sess.Wait()
