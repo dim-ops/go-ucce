@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 
 	"golang.org/x/crypto/ssh"
 )
@@ -113,16 +114,20 @@ func (conn *Connection) SendCommands(CMD string) error {
 		log.Fatal(err)
 	}
 
+	var wg sync.WaitGroup
+
 	var output []byte
 	//Tourne en tâche de fond
 	//Analyse chaque ligne renvoyée dans le terminal
 	//Si contient (yes/no), la fonction le détécte et envoie yes pour arrêter le VOS
 	go func(stdin io.WriteCloser, stdout io.Reader, output *[]byte) {
+		defer wg.Done()
 		var (
 			line string
 			r    = bufio.NewReader(stdout)
 		)
 		for {
+			wg.Add(1)
 			b, err := r.ReadByte()
 			if err != nil {
 				break
@@ -136,16 +141,18 @@ func (conn *Connection) SendCommands(CMD string) error {
 			}
 
 			line += string(b)
+			outputString := string(*output)
+			if strings.HasPrefix(line, "admin") && strings.HasSuffix(line, ":") && strings.Contains(outputString, command) {
 
-			if strings.Contains(line, "admin") && strings.Contains(line, "admin:"+command) {
 				_, err = fmt.Fprintf(stdin, "%s\n", "exit")
 				if err != nil {
 					log.Fatal(err)
 				}
-				log.Println("Two conditions are ok, exit has been send")
+				log.Println("Les 3 conditions sont remplises")
+				break
 			}
 
-			if strings.Contains(line, "Enter (yes/no)") && strings.Contains(line, "admin:"+command) {
+			if strings.Contains(line, "Enter (yes/no)") {
 				_, err = fmt.Fprintf(stdin, "%s\n", "yes")
 				if err != nil {
 					log.Fatal(err)
@@ -153,9 +160,10 @@ func (conn *Connection) SendCommands(CMD string) error {
 			}
 
 		}
-
 		fmt.Print(string(*output))
 	}(stdin, stdout, &output)
+
+	wg.Wait()
 
 	//Attend que la ou les commandes ssh n'execute
 	err = sess.Wait()
