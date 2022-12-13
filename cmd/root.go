@@ -12,19 +12,19 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
+var (
+	host, user, password, typeOf, cfgFile string
+	port                                  uint16
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "go-ucce",
 	Version: "1.0.0",
-	Short:   "To Write",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Short:   "go-ucce is a CLI tool to query UCCE Cisco appliance.",
+	Long: `go-ucce is a CLI tool to query UCCE Cisco appliance.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+This CLI send command via SSH, you need to specify : host, port, user, password and instance type`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
@@ -33,11 +33,10 @@ to quickly create a Cobra application.`,
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	// err := rootCmd.Execute()
-	// if err != nil {
-	// 	os.Exit(1)
-	// }
-	statusCmd.Execute()
+	err := rootCmd.Execute()
+	if err != nil {
+		os.Exit(1)
+	}
 }
 
 func init() {
@@ -50,6 +49,11 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
+	rootCmd.PersistentFlags().StringVarP(&host, "host", "a", "", "Hostname or IP address targeted")
+	rootCmd.PersistentFlags().Uint16VarP(&port, "port", "p", 22, "Ssh port used")
+	rootCmd.PersistentFlags().StringVarP(&user, "user", "u", "", "User used to login")
+	rootCmd.PersistentFlags().StringVarP(&password, "password", "x", "", "Password used to login")
+	rootCmd.PersistentFlags().StringVarP(&typeOf, "typeOf", "t", "", "Type of UCCE Instance (Finesse, Cuic...)")
 }
 
 func initConfig() {

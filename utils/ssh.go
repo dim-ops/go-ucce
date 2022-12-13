@@ -48,7 +48,6 @@ type Connection struct {
 
 func Connect(user, password, host string) (*Connection, error) {
 
-	fmt.Println("---- begin func Connect ----")
 	sshConfig := &ssh.ClientConfig{
 		User: user,
 		Auth: []ssh.AuthMethod{
@@ -56,27 +55,21 @@ func Connect(user, password, host string) (*Connection, error) {
 		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
-
-	fmt.Println("---- begin dial ----")
 	conn, err := ssh.Dial("tcp", host, sshConfig)
 	if err != nil {
 		return nil, err
 		//return nil, fmt.Errorf("Failed to dial: %s", err)
 	}
 
-	fmt.Println("---- end func Connect ----")
 	return &Connection{conn, user, password}, nil
 }
 
 func (conn *Connection) newSession() (*ssh.Session, error) {
-	fmt.Println("---- begin newSession ----")
-	fmt.Print(conn)
 	session, err := conn.NewSession()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer session.Close()
-	fmt.Println("---- end newSession ----")
 
 	modes := ssh.TerminalModes{
 		ssh.ECHO:          0,     // disable echoing
@@ -84,22 +77,17 @@ func (conn *Connection) newSession() (*ssh.Session, error) {
 		ssh.TTY_OP_OSPEED: 14400, // output speed = 14.4kbaud
 	}
 
-	fmt.Println("---- begin RequestPty ----")
 	if err := session.RequestPty("xterm", 0, 40, modes); err != nil {
 		session.Close()
 		return nil, fmt.Errorf("request for pseudo terminal failed: %s", err)
 	}
 
-	fmt.Println("---- end newSession ----")
 	return session, nil
 }
 
 func (conn *Connection) SendCommands(cmd string) error {
 
-	fmt.Println("---- begin SendCommands ----")
-	//command := SelectCommand(CMD, Brique)
 	//Lancement de la connexion SSH
-	fmt.Print(conn)
 	sess, err := conn.newSession()
 	if err != nil {
 		log.Fatal(err)
@@ -190,5 +178,5 @@ func (conn *Connection) SendCommands(cmd string) error {
 		log.Fatal(err)
 	}
 
-	return err
+	return nil
 }
