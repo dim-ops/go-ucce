@@ -13,7 +13,7 @@ import (
 
 var replicationCmd = &cobra.Command{
 	Use:   "replication",
-	Short: "Get status replication",
+	Short: "Get status replication of databases",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// Storing task in backend calling my-todos REST API

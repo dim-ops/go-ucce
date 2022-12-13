@@ -13,8 +13,7 @@ import (
 
 var serviceCmd = &cobra.Command{
 	Use:   "service",
-	Short: "Create a todo",
-	Long:  `This command will create todo`,
+	Short: "List every services",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// Storing task in backend calling my-todos REST API
@@ -22,7 +21,7 @@ var serviceCmd = &cobra.Command{
 		if err != nil {
 			fmt.Print(err.Error())
 		}
-		err = conn.SendCommands("show status")
+		err = conn.SendCommands("utils service list")
 		if err != nil {
 			fmt.Println(fmt.Errorf("failed to send command: %s", err))
 		}

@@ -13,7 +13,7 @@ import (
 
 var licenceCmd = &cobra.Command{
 	Use:   "licence",
-	Short: "Get status licence",
+	Short: "Get status licence of CUIC appliance",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// Storing task in backend calling my-todos REST API

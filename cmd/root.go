@@ -50,7 +50,6 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.PersistentFlags().StringVarP(&host, "host", "a", "", "Hostname or IP address targeted")
-	rootCmd.PersistentFlags().Uint16VarP(&port, "port", "p", 22, "Ssh port used")
 	rootCmd.PersistentFlags().StringVarP(&user, "user", "u", "", "User used to login")
 	rootCmd.PersistentFlags().StringVarP(&password, "password", "x", "", "Password used to login")
 	rootCmd.PersistentFlags().StringVarP(&typeOf, "typeOf", "t", "", "Type of UCCE Instance (Finesse, Cuic...)")
