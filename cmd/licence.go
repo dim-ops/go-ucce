@@ -6,8 +6,9 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
-	ssh "github.com/DimProject/ucce-cisco/utils"
+	ssh "github.com/dim-ops/go-ucce/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -15,6 +16,13 @@ var licenceCmd = &cobra.Command{
 	Use:   "licence",
 	Short: "Get status licence of CUIC appliance",
 	Run: func(cmd *cobra.Command, args []string) {
+
+		allowedType = []string{"cuic"}
+
+		err := checkUcceType(allowedType, typeOf)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
 
 		// Storing task in backend calling my-todos REST API
 		conn, err := ssh.Connect(user, password, host)

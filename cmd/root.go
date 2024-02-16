@@ -12,19 +12,16 @@ import (
 	"github.com/spf13/viper"
 )
 
-var (
-	host, user, password, typeOf, cfgFile string
-	port                                  uint16
-)
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:     "go-ucce",
-	Version: "1.0.0",
-	Short:   "go-ucce is a CLI tool to query UCCE Cisco appliance.",
+	Use:       "go-ucce",
+	Version:   "1.0.0",
+	Args:      cobra.OnlyValidArgs,
+	ValidArgs: []string{"always", "never", "auto"},
+	Short:     "go-ucce is a CLI tool to query UCCE Cisco appliance.",
 	Long: `go-ucce is a CLI tool to query UCCE Cisco appliance.
 
-This CLI send command via SSH, you need to specify : host, port, user, password and instance type`,
+This CLI send command via SSH, you need to specify : host, user, password and instance type`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
@@ -45,7 +42,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.ucce-cisco.yaml)")
+	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.go-ucce.yaml)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -53,6 +50,10 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&user, "user", "u", "", "User used to login")
 	rootCmd.PersistentFlags().StringVarP(&password, "password", "x", "", "Password used to login")
 	rootCmd.PersistentFlags().StringVarP(&typeOf, "typeOf", "t", "", "Type of UCCE Instance (Finesse, Cuic...)")
+	rootCmd.MarkPersistentFlagRequired("host")
+	rootCmd.MarkPersistentFlagRequired("user")
+	rootCmd.MarkPersistentFlagRequired("password")
+	rootCmd.MarkPersistentFlagRequired("typeOf")
 }
 
 func initConfig() {

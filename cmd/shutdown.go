@@ -6,8 +6,9 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
-	ssh "github.com/DimProject/ucce-cisco/utils"
+	ssh "github.com/dim-ops/go-ucce/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +17,13 @@ var shutdownCmd = &cobra.Command{
 	Short: "Gracefully shutdown UCCE appliance",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		// Storing task in backend calling my-todos REST API
+		allowedType = []string{"cuic", "finesse", "vvb"}
+
+		err := checkUcceType(allowedType, typeOf)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+
 		conn, err := ssh.Connect(user, password, host)
 		if err != nil {
 			fmt.Print(err.Error())

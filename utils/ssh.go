@@ -48,6 +48,9 @@ type Connection struct {
 
 func Connect(user, password, host string) (*Connection, error) {
 
+	// Add ssh port
+	host = host + ":22"
+
 	sshConfig := &ssh.ClientConfig{
 		User: user,
 		Auth: []ssh.AuthMethod{

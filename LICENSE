@@ -1,22 +1,6 @@
-fix port flag
 add viper feature
 dev UT
 fix french comments
 create example
 do a readme
-rename project to go-ucce-cisco
-description command
-
-
-	case "jtapi_users":
-		command = "run sql select name from ApplicationUser where name like '%jtapi%'"
-	case "shutdown":
-		if brique != "cusp" {
-			CMD = "{utils system shutdown}"
-			//commands = []string{CMD, "\n"}
-		} else {
-			CMD = "shutdown"
-			//commands = []string{CMD}
-		}
-
-	}
+rename project to -cisco
